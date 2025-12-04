@@ -3,419 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giáng Sinh Ấm Áp 2025 - Final Edit</title>
+    <title>Gửi Anh Trai Nơi Xa - Giáng Sinh 2025</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 1. CẤU HÌNH CHUNG --- */
+        /* --- 1. CẤU HÌNH GIAO DIỆN --- */
         :root {
             --bg-color: #fdf6e3;
             --paper-color: #fffdf0;
             --text-color: #5d4037;
             --accent-red: #c62828;
-            --accent-red-light: rgba(198, 40, 40, 0.3);
             --accent-green: #2e7d32;
-            --gold: #fbc02d;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Nunito', sans-serif;
-            overflow-x: hidden;
-            min-height: 100vh;
-            position: relative;
+            background-color: var(--bg-color); color: var(--text-color);
+            font-family: 'Nunito', sans-serif; overflow-x: hidden; min-height: 100vh;
         }
 
-        /* --- 2. HIỆU ỨNG NỀN (RÀ SOÁT 1 & 2) --- */
-        /* Lớp 1: Tuyết rơi (Canvas) - Nằm dưới cùng */
-        #snow-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: -2; opacity: 0.8;
-        }
-
-        /* Lớp 2: Sticker Khổng Lồ (Tạo chiều sâu) - Nằm trên tuyết, dưới nội dung */
-        .sticker-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: -1; overflow: hidden;
-        }
-
+        /* --- 2. HIỆU ỨNG NỀN --- */
+        #snow-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -2; opacity: 0.8; }
+        .sticker-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: hidden; }
         .emoji {
-            position: absolute;
-            font-size: 25rem; /* Kích thước rất lớn */
-            opacity: 0.12; /* Rất mờ để làm nền */
-            filter: blur(3px); /* Làm nhòe nhẹ để tạo độ sâu trường ảnh */
-            animation: floatBackground 12s ease-in-out infinite alternate;
-            user-select: none;
+            position: absolute; font-size: 25rem; opacity: 0.12; filter: blur(3px);
+            animation: floatBackground 12s ease-in-out infinite alternate; user-select: none;
         }
-
         @keyframes floatBackground {
             0% { transform: translateY(0) rotate(-5deg) scale(1); }
             100% { transform: translateY(-40px) rotate(5deg) scale(1.05); }
         }
+        .s1 { top: -5%; left: -2%; } .s2 { top: 15%; right: -8%; color: var(--accent-red); }
+        .s3 { top: 55%; left: -10%; } .s4 { bottom: -15%; right: 2%; color: var(--accent-green); }
+        .s5 { top: 30%; left: 40%; opacity: 0.08; font-size: 30rem; }
 
-        /* Vị trí Sticker nền */
-        .s1 { top: -5%; left: -2%; animation-delay: 0s; } 
-        .s2 { top: 15%; right: -8%; animation-delay: 2s; color: var(--accent-red); }
-        .s3 { top: 55%; left: -10%; animation-delay: 4s; }
-        .s4 { bottom: -15%; right: 2%; animation-delay: 1s; color: var(--accent-green); }
-        .s5 { top: 30%; left: 40%; opacity: 0.08; animation-delay: 3s; font-size: 30rem; } /* Cái ở giữa to hơn và mờ hơn */
-
-        /* --- 3. CONTAINER NỘI DUNG --- */
-        .container {
-            max-width: 1200px; margin: 0 auto; padding: 20px;
-            position: relative; z-index: 10; /* Nổi hẳn lên trên nền */
+        /* --- 3. LAYOUT CHÍNH --- */
+        .container { 
+            max-width: 1200px; margin: 0 auto; padding: 20px; 
+            position: relative; z-index: 10; 
+            min-height: 90vh; display: flex; flex-direction: column; justify-content: center;
         }
-
-        header { text-align: center; margin: 60px 0; }
+        header { text-align: center; margin-bottom: 50px; }
         
-        /* --- CSS CHO CÁC VĂN BẢN CÓ THỂ SỬA (RÀ SOÁT 5) --- */
-        /* Class chung cho các tiêu đề H1, H3, Div title */
-        .editable-heading {
-            outline: none; /* Loại bỏ viền xanh mặc định khi click */
-        }
-
-        h1.editable-heading {
-            font-family: 'Dancing Script', cursive; font-size: 5rem;
-            color: var(--accent-red); text-shadow: 2px 2px 0 #fff;
-            margin-bottom: 10px; line-height: 1.1;
-        }
+        .editable-heading { outline: none; }
+        h1.editable-heading { font-family: 'Dancing Script', cursive; font-size: 5rem; color: var(--accent-red); text-shadow: 2px 2px 0 #fff; margin-bottom: 10px; }
         .sub-title.editable-heading {
-            text-transform: uppercase; letter-spacing: 4px; font-weight: bold;
-            color: var(--accent-green); border-top: 2px solid var(--accent-red);
-            border-bottom: 2px solid var(--accent-red); display: inline-block;
-            padding: 5px 20px;
-        }
-        h3.editable-heading {
-            text-align:center; color:var(--accent-red); margin-bottom:15px; 
-            font-family:'Dancing Script'; font-size:2.2rem;
-        }
-        .gallery-title.editable-heading {
-            text-align: center; font-family: 'Dancing Script'; 
-            font-size: 3.5rem; color: var(--accent-green); margin-bottom: 40px;
+            text-transform: uppercase; letter-spacing: 4px; font-weight: bold; color: var(--accent-green);
+            border-top: 2px solid var(--accent-red); border-bottom: 2px solid var(--accent-red); display: inline-block; padding: 5px 20px;
         }
 
-        /* --- 4. LAYOUT CHÍNH (Video & Thư) --- */
-        .main-section {
-            display: flex; gap: 40px; margin-bottom: 80px; align-items: flex-start;
-        }
+        /* --- 4. VIDEO & LETTER SECTION --- */
+        .main-section { display: flex; gap: 50px; align-items: stretch; }
+        
+        /* Box chung */
         .christmas-card {
-            background: #fff; padding: 20px; border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(198, 40, 40, 0.15);
-            border: 3px solid var(--accent-red); position: relative;
+            background: #fff; padding: 25px; border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(198, 40, 40, 0.15); border: 3px solid var(--accent-red); position: relative;
+            display: flex; flex-direction: column;
         }
-        .christmas-card::after { content: '❄'; position: absolute; top: 8px; right: 12px; color: var(--accent-red); font-size: 1.5rem; }
-        .christmas-card::before { content: '★'; position: absolute; top: 8px; left: 12px; color: var(--gold); font-size: 1.5rem; }
 
-        .video-box { flex: 1.5; min-width: 300px; }
-        .video-player {
+        /* Youtube Box */
+        .video-box { flex: 1.3; min-width: 320px; }
+        
+        .video-wrapper {
             width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px;
-            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
-            border: 2px solid #eee;
+            position: relative; overflow: hidden; border: 2px solid #eee;
+            margin-top: auto; margin-bottom: auto;
         }
-        video { width: 100%; height: 100%; object-fit: contain; }
-        .empty-video-msg { color: #fff; opacity: 0.7; font-family: 'Nunito'; }
+        iframe { width: 100%; height: 100%; border: none; }
 
+        .no-video {
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;
+        }
+
+        /* Letter Box */
         .letter-box {
-            flex: 1; min-width: 300px;
-            background: var(--paper-color);
+            flex: 1; min-width: 300px; background: var(--paper-color);
             background-image: repeating-linear-gradient(var(--paper-color) 0px, var(--paper-color) 29px, #e1e1e1 30px);
-            line-height: 30px; transform: rotate(1deg);
-            padding: 25px 20px 20px 20px;
+            line-height: 34px; transform: rotate(1deg); padding: 30px 25px;
         }
-        .letter-content-area {
-            width: 100%; min-height: 300px;
-            font-family: 'Dancing Script', cursive; font-size: 1.8rem;
-            color: #3e2723; outline: none; white-space: pre-wrap;
+        .letter-content-area { 
+            width: 100%; height: 100%; min-height: 350px;
+            font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: #3e2723; outline: none; white-space: pre-wrap; 
         }
 
-        /* --- 5. GALLERY ẢNH --- */
-        .gallery-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 35px; padding-bottom: 50px;
+        /* --- 5. ADMIN CONTROLS --- */
+        #admin-panel { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 100; }
+        .icon-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: 3px solid var(--accent-red);
+            background: #fff; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: 0.3s; display: flex; align-items: center; justify-content: center;
         }
-        .polaroid {
-            background: white; padding: 12px 12px 55px 12px;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
-            transition: transform 0.3s; position: relative;
-            transform: rotate(var(--deg));
-        }
-        .polaroid:hover { transform: scale(1.05) rotate(0deg) !important; z-index: 20; box-shadow: 10px 10px 30px rgba(0,0,0,0.3); }
-        .img-wrap { height: 260px; width: 100%; background: #eee; position: relative; overflow: hidden;}
-        .img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .caption {
-            position: absolute; bottom: 10px; left: 5%; width: 90%;
-            text-align: center; font-family: 'Dancing Script'; font-size: 1.5rem;
-            border: none; background: transparent; color: #555; outline: none;
-            pointer-events: none; /* Mặc định không cho click */
-            border-bottom: 2px solid transparent; /* Chuẩn bị cho chế độ admin */
-            transition: all 0.3s;
+        .icon-btn:hover { transform: scale(1.1); }
+        
+        #save-status {
+            position: fixed; top: 30px; right: 150px; background: rgba(0,0,0,0.7); color: #fff;
+            padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; opacity: 0; transition: opacity 0.5s; z-index: 99;
         }
 
-        /* --- 6. ADMIN CONTROL (RÀ SOÁT 3 & 4) --- */
-        #admin-btn {
-            position: fixed; top: 20px; right: 20px;
-            width: 55px; height: 55px; border-radius: 50%;
-            background: #fff; border: 3px solid var(--accent-red);
-            font-size: 1.8rem; cursor: pointer; z-index: 100;
-            box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3); transition: 0.3s;
+        /* Admin Layer */
+        .admin-overlay { display: none !important; }
+        
+        body.is-admin .admin-overlay {
+            display: flex !important; position: absolute; inset: 0; background: rgba(0,0,0,0.7);
+            justify-content: center; align-items: center; cursor: pointer; opacity: 0; transition: 0.3s;
+            z-index: 20;
         }
-        #admin-btn:hover { transform: scale(1.1); background: var(--accent-red); color: white; }
-
-        /* Mặc định ẩn nút upload */
-        .admin-controls { display: none !important; }
-
-        /* --- CSS KHI CHẾ ĐỘ ADMIN ĐƯỢC BẬT --- */
-        /* 1. Hiện nút upload khi hover */
-        body.is-admin .admin-controls {
-            display: flex !important; position: absolute; inset: 0;
-            background: rgba(0,0,0,0.6); justify-content: center; align-items: center;
-            cursor: pointer; opacity: 0; transition: opacity 0.3s;
-        }
-        body.is-admin .img-wrap:hover .admin-controls,
-        body.is-admin .video-player:hover .admin-controls { opacity: 1; }
-
-        /* 2. Đánh dấu các vùng văn bản có thể sửa (Visual Cues) */
-        body.is-admin .editable-heading,
-        body.is-admin .letter-content-area {
-            cursor: text;
-            border: 2px dashed var(--accent-red-light); /* Viền nét đứt đỏ nhạt */
-            border-radius: 4px; padding: 2px 5px;
-            transition: background 0.3s;
-        }
-        /* Hiệu ứng khi di chuột vào vùng sửa */
-        body.is-admin .editable-heading:hover,
-        body.is-admin .letter-content-area:hover {
-            background: rgba(255, 255, 255, 0.6);
-            border-color: var(--accent-red);
+        body.is-admin .video-wrapper:hover .admin-overlay { opacity: 1; }
+        
+        body.is-admin .editable-heading, body.is-admin .letter-content-area {
+            cursor: text; border: 2px dashed rgba(198, 40, 40, 0.5); border-radius: 4px; background: rgba(255,255,255,0.5);
         }
 
-        /* 3. Đánh dấu caption ảnh */
-        body.is-admin .caption {
-             pointer-events: auto; /* Cho phép click */
-             border-bottom: 2px dashed var(--accent-red); /* Gạch chân nét đứt */
-             background: rgba(255,255,255,0.8);
+        .btn-youtube {
+            background: #FF0000; color: white; padding: 12px 25px; border-radius: 30px;
+            font-weight: bold; border: 2px solid white; font-family: sans-serif;
+            display: flex; align-items: center; gap: 8px;
         }
 
-
-        .btn-upload {
-            background: var(--accent-red); color: white;
-            padding: 10px 20px; border-radius: 30px; font-size: 1rem;
-            border: 2px solid white; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        /* --- 7. ANIMATION & RESPONSIVE --- */
-        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        @media (max-width: 768px) {
+        @media (max-width: 850px) {
             .main-section { flex-direction: column; }
             h1.editable-heading { font-size: 3.5rem; }
-            /* Mobile: Giảm kích thước sticker nền để không chiếm hết màn hình */
-            .emoji { font-size: 12rem; opacity: 0.08; } 
+            .container { justify-content: flex-start; margin-top: 30px; }
         }
     </style>
 </head>
 <body>
 
     <canvas id="snow-canvas"></canvas>
-
     <div class="sticker-wrapper">
-        <div class="emoji s1">🎄</div>
-        <div class="emoji s2">🎁</div>
-        <div class="emoji s3">❄️</div>
-        <div class="emoji s4">🦌</div>
-        <div class="emoji s5">🎅</div>
+        <div class="emoji s1">🎄</div><div class="emoji s2">🎁</div><div class="emoji s3">❄️</div><div class="emoji s4">🦌</div><div class="emoji s5">🎅</div>
     </div>
 
-    <button id="admin-btn" onclick="toggleAdmin()" title="Mở khóa chỉnh sửa">🔒</button>
+    <div id="save-status">Đang lưu...</div>
+    <div id="admin-panel">
+        <button class="icon-btn" id="save-btn" onclick="saveAllData()" style="display:none" title="Lưu thay đổi">💾</button>
+        <button class="icon-btn" id="admin-btn" onclick="toggleAdmin()" title="Mở khóa Admin">🔒</button>
+    </div>
 
     <div class="container">
-        <header class="reveal">
-            <h1 class="editable-heading" contenteditable="false">Merry Christmas 2025</h1>
-            <span class="sub-title editable-heading" contenteditable="false">Gửi trọn yêu thương</span>
+        <header>
+            <h1 id="txt-title-main" class="editable-heading" contenteditable="false">Merry Christmas 2025</h1>
+            <span id="txt-subtitle" class="sub-title editable-heading" contenteditable="false">Gửi trọn yêu thương</span>
         </header>
 
         <div class="main-section">
-            <div class="christmas-card video-box reveal">
-                <h3 class="editable-heading" contenteditable="false">Khoảnh Khắc Của Chúng Ta</h3>
+            <div class="christmas-card video-box">
+                <h3 id="txt-video-title" class="editable-heading" style="text-align: center; font-family:'Dancing Script'; color:#c62828; font-size: 2.2rem; margin-bottom: 15px;" contenteditable="false">Món quà tinh thần</h3>
                 
-                <div class="video-player">
-                    <video id="main-video" controls>
-                        <source src="" type="video/mp4">
-                    </video>
-                    <div class="empty-video-msg" id="empty-msg">Chưa có video nào được đăng...</div>
-                    <label class="admin-controls">
-                        <div class="btn-upload">▶ Thay Video</div>
-                        <input type="file" hidden accept="video/*" onchange="handleFile(this, 'video')">
-                    </label>
+                <div class="video-wrapper" id="video-container">
+                    <div class="no-video" id="placeholder-msg">
+                        <span style="font-size: 3rem;">📺</span>
+                        <p style="margin-top:10px">Đang tải video...</p>
+                    </div>
+
+                    <div class="admin-overlay" onclick="updateYoutubeLink()">
+                        <div class="btn-youtube">🔗 Dán Link YouTube</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="christmas-card letter-box reveal">
-                <div id="letter-content" class="letter-content-area" contenteditable="false">
-Thân gửi các bạn,
+            <div class="christmas-card letter-box">
+                <div id="txt-letter" class="letter-content-area" contenteditable="false">🇰🇷 <b>Gửi gắm tới anh trai nơi xứ người!</b>
 
-Giáng sinh năm 2025 đã đến thật rồi! 
-Cảm ơn vì chúng ta đã đồng hành cùng nhau suốt một năm đầy biến động nhưng cũng thật nhiều niềm vui.
+Anh lên đường dù xa xôi, chúc anh chân cứng đá mềm, học hành tấn tới, gặt hái được thật nhiều thành tựu, sớm ngày trở về làm rạng danh gia đình.
 
-Chúc mọi người một mùa đông không lạnh, tràn đầy quà và tiếng cười.
-
-Merry Christmas & Happy New Year!
-❤️
-Admin.
-                </div>
+Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</div>
             </div>
         </div>
-
-        <div class="gallery-title reveal editable-heading" contenteditable="false">Góc Kỷ Niệm</div>
-        
-        <div class="gallery-grid">
-            <div class="polaroid reveal" style="--deg: -2deg;">
-                <div class="img-wrap">
-                    <img id="img-1" src="https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=600" alt="Noel">
-                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-1')"></label>
-                </div>
-                <input type="text" class="caption" value="Cây thông lung linh" readonly>
-            </div>
-
-            <div class="polaroid reveal" style="--deg: 2deg;">
-                <div class="img-wrap">
-                    <img id="img-2" src="https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=600" alt="Noel">
-                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-2')"></label>
-                </div>
-                <input type="text" class="caption" value="Gia đình ấm áp" readonly>
-            </div>
-
-            <div class="polaroid reveal" style="--deg: -1deg;">
-                <div class="img-wrap">
-                    <img id="img-3" src="https://images.unsplash.com/photo-1513297887119-d46091b24bfa?w=600" alt="Noel">
-                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-3')"></label>
-                </div>
-                <input type="text" class="caption" value="Hộp quà bí mật" readonly>
-            </div>
-             <div class="polaroid reveal" style="--deg: 3deg;">
-                <div class="img-wrap">
-                    <img id="img-4" src="https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=600" alt="Noel">
-                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-4')"></label>
-                </div>
-                <input type="text" class="caption" value="Ánh sáng đêm đông" readonly>
-            </div>
-        </div>
-        <div style="height: 50px;"></div>
     </div>
 
     <script>
-        // 1. SCROLL ANIMATION (Hiệu ứng hiện khi cuộn)
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting) entry.target.classList.add('active');
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        // --- 1. CÀI ĐẶT MẶC ĐỊNH ---
+        // Đây là ID video bạn đã cung cấp: https://youtu.be/tWGIh7DWKNM
+        const DEFAULT_VIDEO_ID = "tWGIh7DWKNM"; 
+        let currentVideoId = DEFAULT_VIDEO_ID;
 
-        // 2. ADMIN LOGIC (RÀ SOÁT 3: Đảm bảo chọn đúng mọi phần tử)
+        // --- 2. ADMIN LOGIC ---
         let isAdmin = false;
         function toggleAdmin() {
-            // Chọn tất cả các thẻ H1, H3, Span, Div Title, Div Letter
-            const editableElements = document.querySelectorAll('.editable-heading, .letter-content-area');
-            // Chọn tất cả các input caption
-            const captions = document.querySelectorAll('.caption');
-
             if (!isAdmin) {
-                const pass = prompt("Nhập mật khẩu Admin (Gợi ý: ngày hôm nay dd/mm/yyyy):");
+                const pass = prompt("Nhập mật khẩu (4/12/2025):");
                 if (pass === "4/12/2025") {
                     isAdmin = true;
-                    document.body.classList.add('is-admin'); // Thêm class để kích hoạt CSS Admin
+                    document.body.classList.add('is-admin');
                     document.getElementById('admin-btn').innerText = '🔓';
+                    document.getElementById('save-btn').style.display = 'flex';
                     
-                    // BẬT chế độ sửa cho các thẻ văn bản (contenteditable="true")
-                    editableElements.forEach(el => el.contentEditable = "true");
-
-                    // BẬT chế độ sửa cho các input caption (bỏ readonly)
-                    captions.forEach(el => el.removeAttribute('readonly'));
-                    
-                    alert("Đã mở khóa Admin!\n- Các vùng văn bản có viền nét đứt đỏ là có thể sửa.\n- Di chuột vào ảnh/video để thay đổi.");
+                    document.querySelectorAll('.editable-heading, .letter-content-area').forEach(el => el.contentEditable = "true");
+                    alert("Đã mở khóa! Bạn có thể sửa nội dung hoặc thay đổi link video.");
                 } else {
                     alert("Sai mật khẩu!");
                 }
             } else {
-                // Tắt chế độ Admin
                 isAdmin = false;
                 document.body.classList.remove('is-admin');
                 document.getElementById('admin-btn').innerText = '🔒';
+                document.getElementById('save-btn').style.display = 'none';
                 
-                // KHÓA lại chế độ sửa
-                editableElements.forEach(el => el.contentEditable = "false");
-                captions.forEach(el => el.setAttribute('readonly', true));
+                document.querySelectorAll('.editable-heading, .letter-content-area').forEach(el => el.contentEditable = "false");
             }
         }
 
-        // 3. XỬ LÝ FILE UPLOAD (Video & Ảnh)
-        function handleFile(input, type, targetId) {
-            const file = input.files[0];
-            if (!file) return;
-            const url = URL.createObjectURL(file);
-
-            if (type === 'video') {
-                const vid = document.getElementById('main-video');
-                vid.src = url; vid.load(); vid.play();
-                document.getElementById('empty-msg').style.display = 'none';
-            } else if (type === 'img') {
-                document.getElementById(targetId).src = url;
-            }
-        }
-
-        // 4. HIỆU ỨNG TUYẾT RƠI (RÀ SOÁT 2: Tối ưu Canvas)
-        const canvas = document.getElementById('snow-canvas');
-        const ctx = canvas.getContext('2d');
-        let w, h;
-
-        // Hàm resize để canvas luôn full màn hình
-        function resizeCanvas() {
-            w = canvas.width = window.innerWidth;
-            h = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas(); // Gọi lần đầu
-        
-        // Tạo mảng bông tuyết
-        const flakes = Array.from({length: 180}, () => ({
-            x: Math.random() * w, y: Math.random() * h,
-            r: Math.random() * 3 + 1, // Bán kính (kích thước)
-            d: Math.random() * 3 + 1, // Tốc độ rơi cơ bản
-            a: Math.random() * Math.PI * 2 // Góc lắc lư
-        }));
-
-        function drawSnow() {
-            ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // Màu trắng hơi mờ
-            ctx.beginPath();
-            for (let f of flakes) {
-                ctx.moveTo(f.x, f.y);
-                ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
-            }
-            ctx.fill();
-            moveSnow();
-            requestAnimationFrame(drawSnow);
-        }
-
-        function moveSnow() {
-            for (let f of flakes) {
-                f.y += f.d * 0.4; // Tốc độ rơi xuống
-                f.a += 0.02; // Thay đổi góc lắc
-                f.x += Math.sin(f.a) * 0.5; // Lắc lư ngang nhẹ
-
-                // Nếu rơi xuống đáy thì đưa lên đỉnh lại
-                if (f.y > h) { 
-                    f.y = -5; 
-                    f.x = Math.random() * w; 
+        // --- 3. XỬ LÝ YOUTUBE ---
+        function updateYoutubeLink() {
+            const url = prompt("Dán link YouTube mới vào đây:", `https://youtu.be/${currentVideoId}`);
+            if (url) {
+                const videoId = extractVideoID(url);
+                if (videoId) {
+                    currentVideoId = videoId;
+                    embedYoutube(videoId);
+                    saveAllData(); 
+                } else {
+                    alert("Link không hợp lệ!");
                 }
             }
         }
-        drawSnow(); // Bắt đầu hiệu ứng
+
+        function extractVideoID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function embedYoutube(videoId) {
+            const container = document.getElementById('video-container');
+            const placeholder = document.getElementById('placeholder-msg');
+            
+            if(placeholder) placeholder.style.display = 'none';
+
+            let iframe = container.querySelector('iframe');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                container.insertBefore(iframe, container.firstChild);
+            }
+            // Thêm rel=0 để hạn chế video gợi ý không liên quan
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        }
+
+        // --- 4. LƯU & TẢI DỮ LIỆU ---
+        function saveAllData() {
+            showStatus("Đang lưu...");
+            
+            const data = {
+                title: document.getElementById('txt-title-main').innerText,
+                subtitle: document.getElementById('txt-subtitle').innerText,
+                videoTitle: document.getElementById('txt-video-title').innerText,
+                letter: document.getElementById('txt-letter').innerText, // Sử dụng innerText để giữ xuống dòng
+                videoId: currentVideoId
+            };
+
+            localStorage.setItem('xmas2025_brother_gift', JSON.stringify(data));
+            setTimeout(() => showStatus("Đã lưu xong! ✅"), 500);
+        }
+
+        function loadAllData() {
+            const savedData = localStorage.getItem('xmas2025_brother_gift');
+            if (savedData) {
+                // Nếu có dữ liệu đã lưu trong máy, dùng dữ liệu đó
+                const data = JSON.parse(savedData);
+                if(data.title) document.getElementById('txt-title-main').innerText = data.title;
+                if(data.subtitle) document.getElementById('txt-subtitle').innerText = data.subtitle;
+                if(data.videoTitle) document.getElementById('txt-video-title').innerText = data.videoTitle;
+                if(data.letter) document.getElementById('txt-letter').innerText = data.letter;
+                
+                if (data.videoId) {
+                    currentVideoId = data.videoId;
+                }
+            }
+            
+            // Luôn load video (dù là mặc định hay đã lưu)
+            embedYoutube(currentVideoId);
+        }
+        
+        // Chạy khi mở trang
+        loadAllData();
+
+        function showStatus(msg) {
+            const el = document.getElementById('save-status');
+            el.innerText = msg; el.style.opacity = 1;
+            setTimeout(() => el.style.opacity = 0, 2000);
+        }
+
+        // --- 5. HIỆU ỨNG TUYẾT RƠI ---
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+        const flakes = Array.from({length: 150}, () => ({
+            x: Math.random() * w, y: Math.random() * h, r: Math.random() * 3 + 1, d: Math.random() * 3 + 1
+        }));
+        window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+        function drawSnow() {
+            ctx.clearRect(0, 0, w, h); ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; ctx.beginPath();
+            flakes.forEach(f => {
+                ctx.moveTo(f.x, f.y); ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
+                f.y += f.d * 0.4; f.x += Math.sin(f.y * 0.02) * 0.5;
+                if(f.y > h) { f.y = -5; f.x = Math.random() * w; }
+            });
+            ctx.fill(); requestAnimationFrame(drawSnow);
+        }
+        drawSnow();
     </script>
 </body>
 </html>
