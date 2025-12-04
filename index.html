@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gửi Anh Trai Nơi Xa - Giáng Sinh 2025</title>
+    <title>Gửi Anh Trai Nơi Xa - Kỉ Niệm Anh Em</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -52,7 +52,7 @@
         }
 
         /* --- 4. VIDEO & LETTER SECTION --- */
-        .main-section { display: flex; gap: 50px; align-items: stretch; }
+        .main-section { display: flex; gap: 50px; align-items: stretch; margin-bottom: 50px; }
         
         /* Box chung */
         .christmas-card {
@@ -87,7 +87,58 @@
             font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: #3e2723; outline: none; white-space: pre-wrap; 
         }
 
-        /* --- 5. ADMIN CONTROLS --- */
+        /* --- 5. PHOTO GALLERY SECTION --- */
+        .gallery-section {
+            margin-top: 50px; text-align: center;
+        }
+        .gallery-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: var(--accent-green);
+            margin-bottom: 30px;
+        }
+        .gallery-grid {
+            display: flex; 
+            justify-content: center;
+            padding: 0 20%; 
+        }
+        .photo-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid var(--accent-red);
+            transition: transform 0.3s ease;
+            width: 100%; 
+            max-width: 600px;
+        }
+        .photo-card:hover {
+            transform: scale(1.05);
+        }
+        .photo-frame {
+            width: 100%;
+            height: auto; 
+            max-height: 400px; 
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .photo-frame img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+        .photo-caption {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: var(--text-color);
+            margin-top: 10px;
+            outline: none;
+        }
+
+
+        /* --- 6. ADMIN CONTROLS --- */
         #admin-panel { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 100; }
         .icon-btn {
             width: 50px; height: 50px; border-radius: 50%; border: 3px solid var(--accent-red);
@@ -111,7 +162,7 @@
         }
         body.is-admin .video-wrapper:hover .admin-overlay { opacity: 1; }
         
-        body.is-admin .editable-heading, body.is-admin .letter-content-area {
+        body.is-admin .editable-heading, body.is-admin .letter-content-area, body.is-admin .photo-caption {
             cursor: text; border: 2px dashed rgba(198, 40, 40, 0.5); border-radius: 4px; background: rgba(255,255,255,0.5);
         }
 
@@ -125,6 +176,7 @@
             .main-section { flex-direction: column; }
             h1.editable-heading { font-size: 3.5rem; }
             .container { justify-content: flex-start; margin-top: 30px; }
+            .gallery-grid { padding: 0 5%; }
         }
     </style>
 </head>
@@ -143,7 +195,7 @@
 
     <div class="container">
         <header>
-            <h1 id="txt-title-main" class="editable-heading" contenteditable="false">Merry Christmas 2025</h1>
+            <h1 id="txt-title-main" class="editable-heading" contenteditable="false">Kỉ niệm của anh em</h1>
             <span id="txt-subtitle" class="sub-title editable-heading" contenteditable="false">Gửi trọn yêu thương</span>
         </header>
 
@@ -171,17 +223,32 @@ Anh lên đường dù xa xôi, chúc anh chân cứng đá mềm, học hành t
 Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</div>
             </div>
         </div>
+
+        <div class="gallery-section">
+            <h2 id="txt-gallery-title" class="gallery-title editable-heading" contenteditable="false">Góc Ảnh Đẹp</h2>
+            <div class="gallery-grid">
+                <div class="photo-card">
+                    <div class="photo-frame">
+                        <img id="img-1" src="image.png" alt="Ảnh Kỉ Niệm 1">
+                    </div>
+                    <p id="cap-1" class="photo-caption editable-heading" contenteditable="false">Khoảnh khắc đáng nhớ</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
         // --- 1. CÀI ĐẶT MẶC ĐỊNH ---
-        // Đây là ID video bạn đã cung cấp: https://youtu.be/tWGIh7DWKNM
         const DEFAULT_VIDEO_ID = "tWGIh7DWKNM"; 
         let currentVideoId = DEFAULT_VIDEO_ID;
+        const TEXT_IDS = ['txt-title-main', 'txt-subtitle', 'txt-video-title', 'txt-letter', 'txt-gallery-title', 'cap-1'];
 
         // --- 2. ADMIN LOGIC ---
         let isAdmin = false;
         function toggleAdmin() {
+            const editableElements = document.querySelectorAll('.editable-heading, .letter-content-area');
+            
             if (!isAdmin) {
                 const pass = prompt("Nhập mật khẩu (4/12/2025):");
                 if (pass === "4/12/2025") {
@@ -190,8 +257,8 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
                     document.getElementById('admin-btn').innerText = '🔓';
                     document.getElementById('save-btn').style.display = 'flex';
                     
-                    document.querySelectorAll('.editable-heading, .letter-content-area').forEach(el => el.contentEditable = "true");
-                    alert("Đã mở khóa! Bạn có thể sửa nội dung hoặc thay đổi link video.");
+                    editableElements.forEach(el => el.contentEditable = "true");
+                    alert("Đã mở khóa! Bạn có thể sửa nội dung, tiêu đề và caption ảnh.");
                 } else {
                     alert("Sai mật khẩu!");
                 }
@@ -201,7 +268,7 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
                 document.getElementById('admin-btn').innerText = '🔒';
                 document.getElementById('save-btn').style.display = 'none';
                 
-                document.querySelectorAll('.editable-heading, .letter-content-area').forEach(el => el.contentEditable = "false");
+                editableElements.forEach(el => el.contentEditable = "false");
             }
         }
 
@@ -239,7 +306,6 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
                 iframe.allowFullscreen = true;
                 container.insertBefore(iframe, container.firstChild);
             }
-            // Thêm rel=0 để hạn chế video gợi ý không liên quan
             iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
         }
 
@@ -247,13 +313,12 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
         function saveAllData() {
             showStatus("Đang lưu...");
             
-            const data = {
-                title: document.getElementById('txt-title-main').innerText,
-                subtitle: document.getElementById('txt-subtitle').innerText,
-                videoTitle: document.getElementById('txt-video-title').innerText,
-                letter: document.getElementById('txt-letter').innerText, // Sử dụng innerText để giữ xuống dòng
-                videoId: currentVideoId
-            };
+            const data = { videoId: currentVideoId };
+
+            TEXT_IDS.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) data[id] = el.innerText;
+            });
 
             localStorage.setItem('xmas2025_brother_gift', JSON.stringify(data));
             setTimeout(() => showStatus("Đã lưu xong! ✅"), 500);
@@ -262,23 +327,21 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
         function loadAllData() {
             const savedData = localStorage.getItem('xmas2025_brother_gift');
             if (savedData) {
-                // Nếu có dữ liệu đã lưu trong máy, dùng dữ liệu đó
                 const data = JSON.parse(savedData);
-                if(data.title) document.getElementById('txt-title-main').innerText = data.title;
-                if(data.subtitle) document.getElementById('txt-subtitle').innerText = data.subtitle;
-                if(data.videoTitle) document.getElementById('txt-video-title').innerText = data.videoTitle;
-                if(data.letter) document.getElementById('txt-letter').innerText = data.letter;
+                
+                TEXT_IDS.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && data[id] !== undefined) el.innerText = data[id];
+                });
                 
                 if (data.videoId) {
                     currentVideoId = data.videoId;
                 }
             }
             
-            // Luôn load video (dù là mặc định hay đã lưu)
             embedYoutube(currentVideoId);
         }
         
-        // Chạy khi mở trang
         loadAllData();
 
         function showStatus(msg) {
