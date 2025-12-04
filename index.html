@@ -1,365 +1,444 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Upload, Play, Pause, Volume2, VolumeX, Maximize, 
-  Settings, Edit3, Camera, X, Gift, Heart, Music, 
-  Snowflake, Star, Lock, Unlock, Image as ImageIcon
-} from 'lucide-react';
-
-// --- COMPONENT: HIỆU ỨNG CUỘN TRANG (SCROLL ANIMATION) ---
-const RevealOnScroll = ({ children, delay = 0 }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giáng Sinh Ấm Áp 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 1. CẤU HÌNH GIAO DIỆN --- */
+        :root {
+            --bg-color: #fdf6e3; /* Màu be sáng chủ đạo */
+            --paper-color: #fffdf0;
+            --text-color: #5d4037;
+            --accent-red: #c62828;
+            --accent-green: #2e7d32;
+            --gold: #fbc02d;
         }
-      },
-      { threshold: 0.1 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => {
-      if (ref.current) observer.unobserve(ref.current);
-    };
-  }, []);
 
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-1000 ease-out transform ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
-      }`}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-};
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-// --- DATA MẪU ---
-const INITIAL_PHOTOS = [
-  { id: 1, src: "https://images.unsplash.com/photo-1543589077-47d81606c1bf?auto=format&fit=crop&w=800&q=80", caption: "Đêm Giáng Sinh" },
-  { id: 2, src: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=800&q=80", caption: "Gia đình" },
-  { id: 3, src: "https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?auto=format&fit=crop&w=800&q=80", caption: "Bữa tiệc ấm áp" },
-  { id: 4, src: "https://images.unsplash.com/photo-1482517967863-00e15c9b44be?auto=format&fit=crop&w=800&q=80", caption: "Quà tặng" },
-  { id: 5, src: "https://images.unsplash.com/photo-1545048702-79362596cdc9?auto=format&fit=crop&w=800&q=80", caption: "Tuyết rơi" },
-  { id: 6, src: "https://images.unsplash.com/photo-1511268011861-691ed6d906a0?auto=format&fit=crop&w=800&q=80", caption: "Cây thông" },
-  { id: 7, src: "https://images.unsplash.com/photo-1575373367123-5e9334dd1636?auto=format&fit=crop&w=800&q=80", caption: "Kỷ niệm" },
-  { id: 8, src: "https://images.unsplash.com/photo-1606839655848-0c3330615569?auto=format&fit=crop&w=800&q=80", caption: "Bánh quy gừng" },
-];
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Nunito', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
 
-export default function ChristmasApp() {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [passwordInput, setPasswordInput] = useState("");
-  
-  const [videoSrc, setVideoSrc] = useState(null);
-  const [letterTitle, setLetterTitle] = useState("Thân gửi những người bạn yêu quý,");
-  const [letterContent, setLetterContent] = useState("Giáng sinh năm nay thật đặc biệt. Mong rằng mùa đông này sẽ mang lại cho bạn thật nhiều niềm vui, tiếng cười và những khoảnh khắc ấm áp bên gia đình. Chúc mừng Giáng sinh an lành và năm mới hạnh phúc! \n\nWith love,\nSanta's Helper");
-  const [photos, setPhotos] = useState(INITIAL_PHOTOS);
+        /* --- 2. HIỆU ỨNG NỀN (Tuyết & Sticker) --- */
+        #snow-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; opacity: 0.6;
+        }
 
-  // States cho việc chỉnh sửa
-  const [isEditingLetter, setIsEditingLetter] = useState(false);
-  
-  // Xử lý đăng nhập
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (passwordInput === "4/12/2025") {
-      setIsAdmin(true);
-      setShowLoginModal(false);
-      setPasswordInput("");
-      alert("Chào mừng Admin! Bạn đã có quyền chỉnh sửa.");
-    } else {
-      alert("Mật khẩu không đúng! Hãy thử lại.");
-    }
-  };
+        .sticker-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; overflow: hidden;
+        }
 
-  // Xử lý upload video
-  const handleVideoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setVideoSrc(url);
-    }
-  };
+        .emoji {
+            position: absolute; font-size: 3.5rem;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.15));
+            animation: floatEmoji 6s ease-in-out infinite;
+        }
 
-  // Xử lý thay đổi ảnh (Admin)
-  const handlePhotoChange = (id, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setPhotos(photos.map(p => p.id === id ? { ...p, src: url } : p));
-    }
-  };
+        @keyframes floatEmoji {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(8deg); }
+        }
 
-  return (
-    <div className="min-h-screen bg-[#F3E5D0] text-[#4A3B32] font-serif overflow-x-hidden relative selection:bg-red-200">
-      
-      {/* --- BACKGROUND DECORATIONS (STICKERS) --- */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Top Left */}
-        <div className="absolute top-[-20px] left-[-20px] w-48 h-48 opacity-80 rotate-12 animate-pulse">
-           <img src="https://cdn-icons-png.flaticon.com/512/2663/2663068.png" alt="Holly" />
-        </div>
-        {/* Top Right */}
-        <div className="absolute top-10 right-10 opacity-60 animate-bounce" style={{ animationDuration: '3s' }}>
-           <Snowflake size={64} className="text-red-800" />
-        </div>
-        {/* Bottom Left */}
-        <div className="absolute bottom-10 left-10 opacity-60 animate-spin" style={{ animationDuration: '10s' }}>
-           <Star size={48} className="text-yellow-600 fill-yellow-600" />
-        </div>
-        {/* Bottom Right */}
-        <div className="absolute bottom-[-30px] right-[-30px] w-56 h-56 opacity-80 -rotate-12">
-            <img src="https://cdn-icons-png.flaticon.com/512/628/628833.png" alt="Reindeer" />
-        </div>
-      </div>
+        /* Vị trí Sticker rải rác xung quanh */
+        .s1 { top: 5%; left: 2%; } 
+        .s2 { top: 10%; right: 5%; animation-delay: 1s; }
+        .s3 { top: 45%; left: -10px; animation-delay: 2s; }
+        .s4 { top: 40%; right: 2%; animation-delay: 1.5s; }
+        .s5 { bottom: 10%; left: 5%; animation-delay: 0.5s; }
+        .s6 { bottom: 20%; right: 5%; animation-delay: 2.5s; }
+        .s7 { top: 80%; left: 45%; opacity: 0.5; z-index: -1; } /* Sticker mờ nền */
 
-      {/* --- ADMIN BUTTON --- */}
-      <div className="fixed top-4 right-4 z-50">
-        {!isAdmin ? (
-          <button 
-            onClick={() => setShowLoginModal(true)}
-            className="bg-red-800 text-white p-2 rounded-full shadow-lg hover:bg-red-700 transition-all opacity-50 hover:opacity-100"
-          >
-            <Lock size={16} />
-          </button>
-        ) : (
-          <button 
-            onClick={() => setIsAdmin(false)}
-            className="bg-green-800 text-white px-4 py-2 rounded-full shadow-lg hover:bg-green-700 transition-all flex items-center gap-2"
-          >
-            <Unlock size={16} /> Admin Mode (Thoát)
-          </button>
-        )}
-      </div>
+        /* --- 3. CONTAINER CHÍNH --- */
+        .container {
+            max-width: 1200px; margin: 0 auto; padding: 20px;
+            position: relative; z-index: 10;
+        }
 
-      {/* --- MAIN CONTENT --- */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 md:py-20">
+        header { text-align: center; margin: 60px 0; }
+        h1 {
+            font-family: 'Dancing Script', cursive; font-size: 5rem;
+            color: var(--accent-red); text-shadow: 2px 2px 0 #fff;
+            margin-bottom: 5px;
+        }
+        .sub-title {
+            text-transform: uppercase; letter-spacing: 4px; font-weight: bold;
+            color: var(--accent-green); border-top: 2px solid var(--accent-red);
+            border-bottom: 2px solid var(--accent-red); display: inline-block;
+            padding: 5px 20px;
+        }
+
+        /* --- 4. PHẦN VIDEO & THƯ (Sửa layout) --- */
+        .main-section {
+            display: flex; gap: 40px; margin-bottom: 80px;
+            align-items: flex-start;
+        }
+
+        /* Khung chung mang phong cách Noel */
+        .christmas-card {
+            background: #fff; padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 2px solid var(--accent-red);
+            position: relative;
+        }
+        /* Họa tiết góc */
+        .christmas-card::after {
+            content: '❄'; position: absolute; top: 5px; right: 10px;
+            color: var(--accent-red); font-size: 1.5rem;
+        }
+        .christmas-card::before {
+            content: '★'; position: absolute; top: 5px; left: 10px;
+            color: var(--gold); font-size: 1.5rem;
+        }
+
+        /* Video Area */
+        .video-box { flex: 1.5; min-width: 300px; }
+        .video-player {
+            width: 100%; aspect-ratio: 16/9;
+            background: #000; border-radius: 4px;
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        video { width: 100%; height: 100%; object-fit: contain; }
+        .empty-video-msg { color: #fff; opacity: 0.7; font-family: 'Nunito'; }
+
+        /* Letter Area */
+        .letter-box {
+            flex: 1; min-width: 300px;
+            background: var(--paper-color);
+            background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
+            background-size: 100% 30px; /* Dòng kẻ */
+            transform: rotate(1deg);
+        }
+        .editable-text {
+            width: 100%; min-height: 300px;
+            font-family: 'Dancing Script', cursive; font-size: 1.8rem;
+            line-height: 30px; color: #3e2723;
+            outline: none; padding: 10px;
+            white-space: pre-wrap;
+        }
+
+        /* --- 5. GALLERY (8 Ảnh) --- */
+        .gallery-title {
+            text-align: center; font-family: 'Dancing Script'; 
+            font-size: 3.5rem; color: var(--accent-green);
+            margin-bottom: 40px;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 30px; padding-bottom: 50px;
+        }
+
+        .polaroid {
+            background: white; padding: 12px 12px 50px 12px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.15);
+            transition: transform 0.3s; position: relative;
+            transform: rotate(var(--deg));
+        }
+        .polaroid:hover { transform: scale(1.05) rotate(0deg); z-index: 20; }
         
-        {/* Header */}
-        <RevealOnScroll>
-          <header className="text-center mb-16 relative">
-            <div className="inline-block relative">
-               <h1 className="text-5xl md:text-7xl font-bold text-red-900 tracking-wider mb-2 drop-shadow-sm">
-                Merry Christmas
-              </h1>
-              <div className="absolute -top-6 -right-8 text-4xl animate-bounce">🎅</div>
-            </div>
-            <p className="text-xl md:text-2xl text-[#6B5B4E] italic mt-4">Lưu giữ những khoảnh khắc diệu kỳ</p>
-            <div className="w-24 h-1 bg-red-800 mx-auto mt-6 rounded-full"></div>
-          </header>
-        </RevealOnScroll>
+        .img-wrap {
+            height: 280px; width: 100%; background: #eee;
+            overflow: hidden; position: relative;
+        }
+        .img-wrap img { width: 100%; height: 100%; object-fit: cover; }
 
-        {/* --- SECTION 1: VIDEO & LETTER --- */}
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 mb-24 items-stretch">
-          
-          {/* Cột Trái: Video Upload/Player */}
-          <div className="flex-1 w-full">
-            <RevealOnScroll delay={200}>
-              <div className="relative group">
-                {/* Sticker trang trí video */}
-                <div className="absolute -top-6 -left-6 z-20 text-4xl rotate-[-15deg]">🎄</div>
-                
-                <div className="bg-white p-3 rounded-xl shadow-[5px_5px_0px_0px_rgba(74,59,50,0.2)] border-4 border-[#4A3B32]">
-                  <div className="aspect-video bg-[#2c2c2c] rounded-lg overflow-hidden relative flex items-center justify-center border-2 border-dashed border-gray-500">
-                    
-                    {videoSrc ? (
-                      <video src={videoSrc} controls className="w-full h-full object-contain" />
-                    ) : (
-                      <div className="text-center p-6 text-gray-400 flex flex-col items-center">
-                        <Gift size={48} className="mb-4 text-red-400 opacity-50" />
-                        <p>Chưa có video kỷ niệm nào.</p>
-                        <p className="text-sm mt-2">Đăng tải khoảnh khắc của bạn vào đây!</p>
-                      </div>
-                    )}
+        .caption {
+            position: absolute; bottom: 10px; left: 0; width: 100%;
+            text-align: center; font-family: 'Dancing Script'; font-size: 1.6rem;
+            border: none; background: transparent; color: #555;
+            outline: none; pointer-events: none; /* Mặc định không cho sửa */
+        }
 
-                    {/* Nút Upload chỉ hiện ở giữa nếu chưa có video hoặc nút đổi video góc phải */}
-                    <label className={`
-                      cursor-pointer absolute transition-all hover:scale-110 active:scale-95
-                      ${videoSrc ? 'bottom-4 right-4 bg-white/20 hover:bg-white/40 p-2 rounded-full backdrop-blur-sm' : 'inset-0 flex items-center justify-center opacity-0 hover:opacity-100'}
-                    `}>
-                      <input type="file" accept="video/*" onChange={handleVideoUpload} className="hidden" />
-                      {videoSrc ? <Upload size={20} className="text-white" /> : (
-                        <div className="bg-red-800 text-white px-6 py-3 rounded-full font-bold shadow-lg flex items-center gap-2">
-                           <Upload size={20} /> Đăng Video
-                        </div>
-                      )}
-                    </label>
-                  </div>
-                  
-                  <div className="mt-3 flex justify-between items-center px-2">
-                    <div className="flex gap-2 text-red-800">
-                       <Music size={18} />
-                       <span className="text-xs font-bold uppercase tracking-widest">Now Playing: Jingle Bell Rock</span>
-                    </div>
-                    <div className="flex gap-1">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </RevealOnScroll>
-          </div>
+        /* --- 6. ADMIN CONTROL --- */
+        #admin-btn {
+            position: fixed; top: 20px; right: 20px;
+            width: 50px; height: 50px; border-radius: 50%;
+            background: #fff; border: 2px solid var(--accent-red);
+            font-size: 1.5rem; cursor: pointer; z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+        #admin-btn:hover { background: var(--accent-red); }
 
-          {/* Cột Phải: Lá thư Giáng sinh */}
-          <div className="flex-1 w-full lg:max-w-md">
-            <RevealOnScroll delay={400}>
-              <div className="h-full bg-white p-8 rounded-sm shadow-xl relative rotate-1 transition-transform hover:rotate-0 border border-[#e0d0b8]">
-                {/* Stamp */}
-                <div className="absolute top-4 right-4 w-16 h-20 border-4 border-dotted border-red-300 flex items-center justify-center opacity-70 rotate-6">
-                  <Snowflake className="text-red-300" />
-                </div>
+        /* Mặc định ẨN các nút upload */
+        .admin-controls {
+            display: none !important; 
+        }
 
-                {/* Edit Controls */}
-                {isAdmin && (
-                  <button 
-                    onClick={() => setIsEditingLetter(!isEditingLetter)}
-                    className="absolute top-4 left-4 text-gray-400 hover:text-red-800"
-                  >
-                    <Edit3 size={18} />
-                  </button>
-                )}
+        /* Khi KÍCH HOẠT Admin */
+        body.is-admin .admin-controls {
+            display: flex !important;
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center; align-items: center;
+            cursor: pointer; opacity: 0; transition: opacity 0.3s;
+        }
+        body.is-admin .img-wrap:hover .admin-controls,
+        body.is-admin .video-player:hover .admin-controls { opacity: 1; }
 
-                <div className="h-full flex flex-col">
-                  {isAdmin && isEditingLetter ? (
-                    <input 
-                      type="text" 
-                      value={letterTitle} 
-                      onChange={(e) => setLetterTitle(e.target.value)}
-                      className="text-2xl font-bold text-red-900 mb-6 font-serif border-b border-red-200 focus:outline-none w-full bg-transparent"
-                    />
-                  ) : (
-                    <h2 className="text-2xl font-bold text-red-900 mb-6 font-serif">{letterTitle}</h2>
-                  )}
+        body.is-admin .caption {
+            pointer-events: auto; /* Cho phép sửa caption */
+            border-bottom: 1px dashed red;
+        }
+        body.is-admin .editable-text {
+            background: rgba(255,255,255,0.5);
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+        }
 
-                  <div className="flex-1 text-lg leading-relaxed text-[#5c4d43] relative">
-                    {/* Dòng kẻ ngang mô phỏng giấy viết thư */}
-                    <div className="absolute inset-0 pointer-events-none" style={{
-                      backgroundImage: 'repeating-linear-gradient(transparent, transparent 31px, #e5e5e5 32px)',
-                      top: '6px'
-                    }}></div>
-                    
-                    {isAdmin && isEditingLetter ? (
-                      <textarea 
-                        value={letterContent}
-                        onChange={(e) => setLetterContent(e.target.value)}
-                        className="w-full h-64 bg-transparent border-none focus:outline-none resize-none leading-8 pl-1"
-                      />
-                    ) : (
-                      <p className="whitespace-pre-wrap leading-8 pl-1 relative z-10">{letterContent}</p>
-                    )}
-                  </div>
-                  
-                  <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-end">
-                     <span className="text-sm text-gray-400 italic">Sent from North Pole</span>
-                     <Heart className="text-red-600 fill-red-600 animate-pulse" size={24} />
-                  </div>
-                </div>
-              </div>
-            </RevealOnScroll>
-          </div>
-        </div>
+        .btn-upload {
+            background: var(--accent-red); color: white;
+            padding: 8px 16px; border-radius: 20px; font-size: 0.9rem;
+            border: 2px solid white; font-weight: bold;
+        }
 
-        {/* --- SECTION 2: PHOTO GALLERY --- */}
-        <div className="mt-20">
-          <RevealOnScroll>
-            <div className="flex items-center justify-center mb-12 gap-4">
-               <div className="h-px bg-red-800 w-16 opacity-30"></div>
-               <h3 className="text-3xl font-bold text-[#4A3B32] uppercase tracking-widest text-center">
-                 Góc Kỷ Niệm
-               </h3>
-               <div className="h-px bg-red-800 w-16 opacity-30"></div>
-            </div>
-          </RevealOnScroll>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 px-2">
-            {photos.map((photo, index) => (
-              <RevealOnScroll key={photo.id} delay={index * 100}>
-                <div className="group relative bg-white p-3 pb-12 shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:rotate-1">
-                  {/* Tape decoration */}
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-[#e6d0b3] opacity-80 rotate-2 shadow-sm z-10"></div>
-                  
-                  <div className="aspect-square bg-gray-100 overflow-hidden mb-3 relative">
-                     <img 
-                       src={photo.src} 
-                       alt={photo.caption} 
-                       className="w-full h-full object-cover filter sepia-[0.2] group-hover:sepia-0 transition-all duration-500" 
-                     />
-                     
-                     {/* Admin Photo Upload Overlay */}
-                     {isAdmin && (
-                       <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white">
-                         <input type="file" accept="image/*" onChange={(e) => handlePhotoChange(photo.id, e)} className="hidden" />
-                         <div className="text-center">
-                            <Camera size={24} className="mx-auto mb-1" />
-                            <span className="text-xs">Thay ảnh</span>
-                         </div>
-                       </label>
-                     )}
-                  </div>
-                  
-                  <div className="absolute bottom-3 left-0 right-0 text-center font-handwriting text-xl text-gray-600 rotate-[-1deg]">
-                    {photo.caption}
-                  </div>
-                </div>
-              </RevealOnScroll>
-            ))}
-          </div>
-        </div>
+        /* --- 7. ANIMATION --- */
+        .reveal {
+            opacity: 0; transform: translateY(40px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-      </div>
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-section { flex-direction: column; }
+            h1 { font-size: 3.5rem; }
+            .emoji { font-size: 2rem; opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
 
-      {/* --- FOOTER --- */}
-      <footer className="bg-[#4A3B32] text-[#F3E5D0] py-8 text-center mt-20 relative z-10 border-t-8 border-red-900">
-        <p className="font-serif italic text-lg mb-2">"Merry everything and happy always."</p>
-        <p className="text-sm opacity-60">© 2025 Christmas Memories. Made with ❤️</p>
-      </footer>
+    <canvas id="snow-canvas"></canvas>
 
-      {/* --- ADMIN LOGIN MODAL --- */}
-      {showLoginModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm px-4">
-          <div className="bg-[#F3E5D0] p-8 rounded-xl shadow-2xl max-w-sm w-full border-4 border-[#4A3B32] relative">
-            <button 
-              onClick={() => setShowLoginModal(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-red-800"
-            >
-              <X size={24} />
-            </button>
-            
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-red-800 rounded-full flex items-center justify-center mx-auto mb-3 text-white">
-                <Lock size={32} />
-              </div>
-              <h3 className="text-2xl font-bold text-[#4A3B32]">Khu Vực Admin</h3>
-              <p className="text-sm text-gray-600">Nhập mật khẩu ngày kỷ niệm để mở khóa.</p>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-4">
-              <input 
-                type="password" 
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="dd/mm/yyyy"
-                className="w-full p-3 border-2 border-[#4A3B32] rounded bg-white focus:outline-none focus:border-red-600 text-center tracking-widest text-lg"
-                autoFocus
-              />
-              <button 
-                type="submit" 
-                className="w-full bg-red-800 text-white font-bold py-3 rounded hover:bg-red-700 transition-colors shadow-lg"
-              >
-                Mở Khóa
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+    <div class="sticker-wrapper">
+        <div class="emoji s1">🎄</div>
+        <div class="emoji s2">🎅</div>
+        <div class="emoji s3">🎁</div>
+        <div class="emoji s4">🦌</div>
+        <div class="emoji s5">🍪</div>
+        <div class="emoji s6">⛄</div>
+        <div class="emoji s7">❄️</div>
     </div>
-  );
-}
 
+    <button id="admin-btn" onclick="toggleAdmin()">🔒</button>
+
+    <div class="container">
+        <header class="reveal">
+            <h1>Merry Christmas 2025</h1>
+            <span class="sub-title">Gửi trọn yêu thương</span>
+        </header>
+
+        <div class="main-section">
+            <div class="christmas-card video-box reveal">
+                <h3 style="text-align:center; color:var(--accent-red); margin-bottom:10px; font-family:'Dancing Script'; font-size:2rem;">Khoảnh Khắc Của Chúng Ta</h3>
+                <div class="video-player">
+                    <video id="main-video" controls>
+                        <source src="" type="video/mp4">
+                    </video>
+                    <div class="empty-video-msg" id="empty-msg">Chưa có video nào được đăng...</div>
+                    
+                    <label class="admin-controls">
+                        <div class="btn-upload">▶ Thay Video</div>
+                        <input type="file" hidden accept="video/*" onchange="handleFile(this, 'video')">
+                    </label>
+                </div>
+            </div>
+
+            <div class="christmas-card letter-box reveal">
+                <div id="letter-content" class="editable-text" contenteditable="false">
+Thân gửi các bạn,
+
+Giáng sinh năm 2025 đã đến thật rồi! 
+Cảm ơn vì chúng ta đã đồng hành cùng nhau suốt một năm đầy biến động nhưng cũng thật nhiều niềm vui.
+
+Chúc mọi người một mùa đông không lạnh, tràn đầy quà và tiếng cười.
+
+Merry Christmas & Happy New Year!
+❤️
+Admin.
+                </div>
+            </div>
+        </div>
+
+        <div class="gallery-title reveal">Góc Kỷ Niệm</div>
+        <div class="gallery-grid">
+            <div class="polaroid reveal" style="--deg: -2deg;">
+                <div class="img-wrap">
+                    <img id="img-1" src="https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=600" alt="Noel">
+                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-1')"></label>
+                </div>
+                <input type="text" class="caption" value="Cây thông lung linh" readonly>
+            </div>
+
+            <div class="polaroid reveal" style="--deg: 2deg;">
+                <div class="img-wrap">
+                    <img id="img-2" src="https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=600" alt="Noel">
+                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-2')"></label>
+                </div>
+                <input type="text" class="caption" value="Gia đình" readonly>
+            </div>
+
+            <div class="polaroid reveal" style="--deg: -1deg;">
+                <div class="img-wrap">
+                    <img id="img-3" src="https://images.unsplash.com/photo-1513297887119-d46091b24bfa?w=600" alt="Noel">
+                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-3')"></label>
+                </div>
+                <input type="text" class="caption" value="Những món quà" readonly>
+            </div>
+
+            <div class="polaroid reveal" style="--deg: 3deg;">
+                <div class="img-wrap">
+                    <img id="img-4" src="https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=600" alt="Noel">
+                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-4')"></label>
+                </div>
+                <input type="text" class="caption" value="Điều bí mật" readonly>
+            </div>
+
+            <div class="polaroid reveal" style="--deg: -3deg;">
+                <div class="img-wrap">
+                    <img id="img-5" src="https://images.unsplash.com/photo-1576618148400-f54bed99fcf8?w=600" alt="Noel">
+                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-5')"></label>
+                </div>
+                <input type="text" class="caption" value="Bánh gừng" readonly>
+            </div>
+
+            <div class="polaroid reveal" style="--deg: 1deg;">
+                <div class="img-wrap">
+                    <img id="img-6" src="https://images.unsplash.com/photo-1511268011861-691ed6d906a0?w=600" alt="Noel">
+                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-6')"></label>
+                </div>
+                <input type="text" class="caption" value="Phố lên đèn" readonly>
+            </div>
+
+            <div class="polaroid reveal" style="--deg: -2deg;">
+                <div class="img-wrap">
+                    <img id="img-7" src="https://plus.unsplash.com/premium_photo-1673383549005-2d4da2a26564?w=600" alt="Noel">
+                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-7')"></label>
+                </div>
+                <input type="text" class="caption" value="Bạn thân" readonly>
+            </div>
+
+            <div class="polaroid reveal" style="--deg: 2deg;">
+                <div class="img-wrap">
+                    <img id="img-8" src="https://images.unsplash.com/photo-1545048702-79362596cdc9?w=600" alt="Noel">
+                    <label class="admin-controls"><div class="btn-upload">📷 Thay ảnh</div><input type="file" hidden onchange="handleFile(this, 'img', 'img-8')"></label>
+                </div>
+                <input type="text" class="caption" value="Năm mới 2026" readonly>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. SCROLL ANIMATION
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // 2. ADMIN LOGIC (SỬA LẠI CHO CHẶT CHẼ)
+        let isAdmin = false;
+        function toggleAdmin() {
+            if (!isAdmin) {
+                const pass = prompt("Nhập mật khẩu Admin (dd/mm/yyyy):");
+                if (pass === "4/12/2025") {
+                    isAdmin = true;
+                    document.body.classList.add('is-admin');
+                    document.getElementById('admin-btn').innerText = '🔓';
+                    
+                    // Mở khóa sửa văn bản
+                    const letter = document.getElementById('letter-content');
+                    letter.contentEditable = "true";
+                    letter.focus();
+
+                    // Mở khóa sửa caption ảnh
+                    document.querySelectorAll('.caption').forEach(el => el.removeAttribute('readonly'));
+                    
+                    alert("Đã mở khóa quyền Admin! Di chuột vào ảnh/video để thay đổi.");
+                } else {
+                    alert("Mật khẩu không đúng!");
+                }
+            } else {
+                isAdmin = false;
+                document.body.classList.remove('is-admin');
+                document.getElementById('admin-btn').innerText = '🔒';
+                
+                // Khóa lại
+                document.getElementById('letter-content').contentEditable = "false";
+                document.querySelectorAll('.caption').forEach(el => el.setAttribute('readonly', true));
+            }
+        }
+
+        // 3. XỬ LÝ FILE UPLOAD
+        function handleFile(input, type, targetId) {
+            const file = input.files[0];
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+
+            if (type === 'video') {
+                const vid = document.getElementById('main-video');
+                vid.src = url; 
+                vid.load(); 
+                vid.play();
+                document.getElementById('empty-msg').style.display = 'none'; // Ẩn chữ "Chưa có video"
+            } else if (type === 'img') {
+                document.getElementById(targetId).src = url;
+            }
+        }
+
+        // 4. HIỆU ỨNG TUYẾT RƠI (Canvas Optimized)
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+        const flakes = Array.from({length: 100}, () => ({
+            x: Math.random() * w, y: Math.random() * h,
+            r: Math.random() * 4 + 1,
+            d: Math.random() * 10
+        }));
+
+        window.addEventListener('resize', () => {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        });
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            for (let f of flakes) {
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2, true);
+            }
+            ctx.fill();
+            moveSnow();
+            requestAnimationFrame(drawSnow);
+        }
+
+        function moveSnow() {
+            for (let f of flakes) {
+                f.y += Math.pow(f.d, 2) + 1; // Tốc độ rơi
+                f.x += Math.sin(f.y * 0.05); // Lắc lư
+                
+                if (f.y > h) {
+                    f.y = 0; f.x = Math.random() * w;
+                }
+            }
+        }
+        drawSnow();
+    </script>
+</body>
+</html>
