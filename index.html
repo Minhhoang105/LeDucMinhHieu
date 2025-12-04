@@ -61,7 +61,7 @@
             display: flex; flex-direction: column;
         }
 
-        /* Youtube Box */
+        /* Video Box */
         .video-box { flex: 1.3; min-width: 320px; }
         
         .video-wrapper {
@@ -116,7 +116,8 @@
         }
 
         .btn-youtube {
-            background: #FF0000; color: white; padding: 12px 25px; border-radius: 30px;
+            background: #1ab7ea; /* Màu xanh Vimeo */
+            color: white; padding: 12px 25px; border-radius: 30px;
             font-weight: bold; border: 2px solid white; font-family: sans-serif;
             display: flex; align-items: center; gap: 8px;
         }
@@ -157,8 +158,8 @@
                         <p style="margin-top:10px">Đang tải video...</p>
                     </div>
 
-                    <div class="admin-overlay" onclick="updateYoutubeLink()">
-                        <div class="btn-youtube">🔗 Dán Link YouTube</div>
+                    <div class="admin-overlay" onclick="updateVideoLink()">
+                        <div class="btn-youtube">🔗 Dán Link Vimeo</div>
                     </div>
                 </div>
             </div>
@@ -174,17 +175,15 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
         </div>
 
     <script>
-        // --- 1. CÀI ĐẶT MẶC ĐỊNH ---
-        // Đã cập nhật ID video từ link bạn gửi: https://youtu.be/tWGIh7DWKNM
-        const DEFAULT_VIDEO_ID = "tWGIh7DWKNM"; 
-        let currentVideoId = DEFAULT_VIDEO_ID;
+        // --- 1. CÀI ĐẶT MẶC ĐỊNH (VIMEO ID) ---
+        const DEFAULT_VIDEO_ID = "1143540228"; 
         
+        let currentVideoId = DEFAULT_VIDEO_ID;
         const TEXT_IDS = ['txt-title-main', 'txt-subtitle', 'txt-video-title', 'txt-letter'];
 
         // --- 2. ADMIN LOGIC ---
         let isAdmin = false;
         function toggleAdmin() {
-            // Chỉ chọn heading và letter area
             const editableElements = document.querySelectorAll('.editable-heading, .letter-content-area');
             
             if (!isAdmin) {
@@ -210,28 +209,28 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
             }
         }
 
-        // --- 3. XỬ LÝ YOUTUBE ---
-        function updateYoutubeLink() {
-            const url = prompt("Dán link YouTube mới vào đây:", `https://youtu.be/${currentVideoId}`);
+        // --- 3. XỬ LÝ VIMEO (Đã thay đổi từ YouTube sang Vimeo) ---
+        function updateVideoLink() {
+            const url = prompt("Dán link Vimeo mới vào đây:", `https://vimeo.com/${currentVideoId}`);
             if (url) {
-                const videoId = extractVideoID(url);
+                const videoId = extractVimeoID(url);
                 if (videoId) {
                     currentVideoId = videoId;
-                    embedYoutube(videoId);
+                    embedVimeo(videoId);
                     saveAllData(); 
                 } else {
-                    alert("Link không hợp lệ!");
+                    alert("Link Vimeo không hợp lệ!");
                 }
             }
         }
 
-        function extractVideoID(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
+        function extractVimeoID(url) {
+            // Regex để lấy số ID từ link Vimeo
+            const match = url.match(/vimeo\.com\/(\d+)/);
+            return match ? match[1] : null;
         }
 
-        function embedYoutube(videoId) {
+        function embedVimeo(videoId) {
             const container = document.getElementById('video-container');
             const placeholder = document.getElementById('placeholder-msg');
             
@@ -240,11 +239,12 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
             let iframe = container.querySelector('iframe');
             if (!iframe) {
                 iframe = document.createElement('iframe');
-                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allow = "autoplay; fullscreen; picture-in-picture";
                 iframe.allowFullscreen = true;
                 container.insertBefore(iframe, container.firstChild);
             }
-            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+            // Sử dụng player.vimeo.com
+            iframe.src = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
         }
 
         // --- 4. LƯU & TẢI DỮ LIỆU ---
@@ -257,13 +257,14 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
                 const el = document.getElementById(id);
                 if (el) data[id] = el.innerText;
             });
-
-            localStorage.setItem('xmas2025_brother_gift_v2', JSON.stringify(data));
+            
+            // Đổi key storage để tránh xung đột với phiên bản YouTube cũ
+            localStorage.setItem('xmas2025_brother_vimeo_v1', JSON.stringify(data));
             setTimeout(() => showStatus("Đã lưu xong! ✅"), 500);
         }
 
         function loadAllData() {
-            const savedData = localStorage.getItem('xmas2025_brother_gift_v2');
+            const savedData = localStorage.getItem('xmas2025_brother_vimeo_v1');
             if (savedData) {
                 const data = JSON.parse(savedData);
                 
@@ -277,7 +278,7 @@ Lo gì đường sá khó khăn, cứ chắc tay vững chí mà tiến! 💪</d
                 }
             }
             
-            embedYoutube(currentVideoId);
+            embedVimeo(currentVideoId);
         }
         
         loadAllData();
